@@ -1,0 +1,1 @@
+[2026-11-18] Wrong: `localhost` in the Windows PostgreSQL DSN connected reliably. | Actual: it intermittently stalled while `127.0.0.1` connected promptly. | Rule: use `127.0.0.1` in the local Compose DSN and set a connection timeout for probes.
