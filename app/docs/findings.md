@@ -1,0 +1,1 @@
+[2026-11-18] Wrong: Coil 3.6.3 works with the app's Kotlin 2.2 compiler. | Actual: it resolves Kotlin 2.4 metadata and compilation fails. | Rule: use Coil 3.3.0 until the app compiler is upgraded with dependency compatibility checked.

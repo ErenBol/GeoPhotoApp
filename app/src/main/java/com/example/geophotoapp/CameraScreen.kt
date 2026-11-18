@@ -42,7 +42,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 
 @Composable
-fun CameraScreen(auth: AuthRepository, onCaptured: (String, Double, Double) -> Unit, onSignOut: () -> Unit) {
+fun CameraScreen(auth: AuthRepository, canOpenFeed: Boolean, onFeed: () -> Unit, onCaptured: (String, Double, Double) -> Unit, onSignOut: () -> Unit) {
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
     val scope = rememberCoroutineScope()
@@ -137,6 +137,7 @@ fun CameraScreen(auth: AuthRepository, onCaptured: (String, Double, Double) -> U
             },
             modifier = Modifier.fillMaxWidth().padding(12.dp),
         ) { Text(if (busy) "Getting location and capturing…" else "Take photo") }
+        if (canOpenFeed) OutlinedButton(onClick = onFeed, modifier = Modifier.padding(horizontal = 12.dp)) { Text("Nearby feed") }
         OutlinedButton(onClick = { scope.launch { auth.signOut(); onSignOut() } }, modifier = Modifier.padding(horizontal = 12.dp)) {
             Text("Sign out")
         }

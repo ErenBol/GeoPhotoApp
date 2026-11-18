@@ -3,6 +3,7 @@ package com.example.geophotoapp
 import android.content.Context
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
+import androidx.datastore.preferences.core.doublePreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import com.google.gson.annotations.SerializedName
 import kotlinx.coroutines.flow.Flow
@@ -14,6 +15,10 @@ import retrofit2.http.POST
 
 private val Context.authStore by preferencesDataStore(name = "auth")
 private val tokenKey = stringPreferencesKey("access_token")
+private val unlockedLatKey = doublePreferencesKey("unlocked_lat")
+private val unlockedLonKey = doublePreferencesKey("unlocked_lon")
+
+data class UnlockLocation(val lat: Double, val lon: Double)
 
 data class Credentials(val email: String, val password: String)
 data class Registration(val email: String, val password: String, val username: String)
@@ -38,6 +43,18 @@ class AuthRepository(private val context: Context) {
         .create(AuthApi::class.java)
 
     val token: Flow<String?> = context.authStore.data.map { it[tokenKey] }
+    val unlockedLocation: Flow<UnlockLocation?> = context.authStore.data.map { preferences ->
+        val lat = preferences[unlockedLatKey]
+        val lon = preferences[unlockedLonKey]
+        if (lat != null && lon != null) UnlockLocation(lat, lon) else null
+    }
+
+    suspend fun saveUnlockedLocation(lat: Double, lon: Double) {
+        context.authStore.edit {
+            it[unlockedLatKey] = lat
+            it[unlockedLonKey] = lon
+        }
+    }
 
     suspend fun authenticate(email: String, password: String, username: String?) {
         val response = if (username == null) {
@@ -52,6 +69,10 @@ class AuthRepository(private val context: Context) {
     }
 
     suspend fun signOut() {
-        context.authStore.edit { it.remove(tokenKey) }
+        context.authStore.edit {
+            it.remove(tokenKey)
+            it.remove(unlockedLatKey)
+            it.remove(unlockedLonKey)
+        }
     }
 }
